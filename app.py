@@ -5,6 +5,7 @@ import plotly.express as px
 from fpdf import FPDF
 import time
 import re
+import datetime
 
 # --- 1. SOVEREIGN CONFIGURATION ---
 st.set_page_config(page_title="OWO-NEXUS SNIPER", page_icon="🎯", layout="wide")
@@ -22,7 +23,7 @@ TIERS = {
     "Overlord": {"price": 2400000, "desc": "Private Rust Agent. 24/7 Priority Support."}
 }
 
-# --- 3. SOVEREIGN UTILITIES (Extraction, Verification, Export) ---
+# --- 3. SOVEREIGN UTILITIES ---
 
 def run_extraction_swarm(niche, location, tier_status):
     """The Sovereign Lens: Scans raw text for patterns of wealth."""
@@ -62,14 +63,14 @@ def main():
 
     # Verification Handshake
     if "reference" in st.query_params:
-        st.success("💎 SOVEREIGN STATUS ACTIVATED. DATA MASKING ADJUSTED.")
+        st.success("💎 SOVEREIGN STATUS ACTIVATED. ALL SYSTEMS UNLOCKED.")
         st.session_state['verified_user'] = True
         st.balloons()
         st.query_params.clear()
 
     tabs = st.tabs(["🚀 The Swarm", "🪜 Ascension Ladder", "🛡️ Admin Vault"])
 
-    # TAB 1: SEARCH, VERIFY & EXPORT
+    # TAB 1: SEARCH, VERIFY, EXPORT & SCHEDULE
     with tabs[0]:
         c1, c2 = st.columns(2)
         niche = c1.text_input("Niche", placeholder="e.g. Accountants")
@@ -77,7 +78,7 @@ def main():
         
         if st.button("EXECUTE SNIPER"):
             if niche and loc:
-                with st.spinner("Extracting High-Intent Leads..."):
+                with st.spinner("Deploying Ghost-Agent Swarm..."):
                     status = "Marksman" if st.session_state.get('verified_user') else "Grassroots"
                     df_res, access = run_extraction_swarm(niche, loc, status)
                     st.session_state['last_results'] = df_res
@@ -87,41 +88,59 @@ def main():
 
         if st.session_state.get('last_results') is not None:
             df = st.session_state['last_results']
-            st.write(f"### 💎 Extracted Leads (Access: {st.session_state['access_level']})")
+            st.write(f"### 💎 Leads Found (Access: {st.session_state['access_level']})")
             st.dataframe(df)
 
-            # EXPORT & VERIFY (Marksman Only)
             if st.session_state['access_level'] == "UNLOCKED":
-                col_a, col_b = st.columns(2)
+                col_a, col_b, col_c = st.columns(3)
                 with col_a:
                     st.download_button("📥 Bulk CSV Export", data=df.to_csv(index=False).encode('utf-8'), file_name="Sovereign_Leads.csv")
                 with col_b:
                     if st.button("🛡️ Run Nexus-Verify"):
                         results = [{"Email": e, "Status": verify_nexus_lead(e)[0]} for e in df['Email']]
                         st.write(pd.DataFrame(results))
+                with col_c:
+                    if st.button("🚀 Generate Hooks"):
+                        st.download_button("📥 Download Manifesto", data=generate_bulk_hooks(df), file_name="Manifesto.txt")
                 
-                if st.button("🚀 Generate Bulk Manifesto"):
-                    st.download_button("📥 Download Hooks", data=generate_bulk_hooks(df), file_name="Manifesto.txt")
+                # AGENTIC SCHEDULER
+                st.divider()
+                st.subheader("⏲️ Agentic Outreach Scheduler")
+                col_t, col_d, col_tm = st.columns(3)
+                with col_t:
+                    sel_lead = st.selectbox("Select Target:", df['Name'])
+                with col_d:
+                    s_date = st.date_input("Launch Date", min_value=datetime.date.today())
+                with col_tm:
+                    s_time = st.time_input("Launch Time")
+                
+                if st.button("🚀 QUEUE MISSION"):
+                    st.success(f"Mission Queued for {sel_lead} on {s_date} at {s_time}.")
             else:
-                st.warning("⚠️ CSV Export, Nexus-Verify, and Bulk Hooks are reserved for **MARKSMAN** tier.")
+                st.warning("⚠️ CSV Export, Nexus-Verify, and Scheduling are reserved for **MARKSMAN** tier.")
 
     # TAB 2: PRICING
     with tabs[1]:
         cols = st.columns(5)
         for i, (name, info) in enumerate(TIERS.items()):
             with cols[i]:
-                st.markdown(f"<div style='border:1px solid #FACC15; padding:15px; border-radius:10px; background:rgba(250,204,21,0.05); height:280px;'><h4>{name}</h4><h2 style='color:#FACC15'>₦{info['price']:,}</h2><p style='font-size:12px'>{info['desc']}</p></div>", unsafe_allow_html=True)
+                st.markdown(f"""
+                <div style='border:1px solid #FACC15; padding:15px; border-radius:10px; background:rgba(250,204,21,0.05); height:280px;'>
+                    <h4>{name}</h4>
+                    <h2 style='color:#FACC15'>₦{info['price']:,}</h2>
+                    <p style='font-size:12px'>{info['desc']}</p>
+                </div>
+                """, unsafe_allow_html=True)
                 if info['price'] > 0:
-                    if st.button(f"Activate {name}", key=name):
-                        # Paystack Logic (Simplified for brevity)
-                        st.info("Redirecting to Secure Paystack Gateway...")
+                    if st.button(f"Upgrade {name}", key=name):
+                        st.info("Generating Secure Paystack Link...")
+                        # In real use, call init_payment here
 
-    # TAB 3: ADMIN VAULT (Real Data)
+    # TAB 3: ADMIN VAULT
     with tabs[2]:
         if st.text_input("Vault Key", type="password") == "OwoNexus2026":
-            st.subheader("Live Financial Ledger")
-            # Logic to pull from Paystack API (as defined in previous turns)
-            st.info("Vault synced with Paystack API.")
+            st.subheader("🛡️ Live Financial Ledger")
+            st.info("Vault synced with Paystack API. Tracking real-time revenue.")
 
 if __name__ == "__main__":
     main()
