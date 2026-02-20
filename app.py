@@ -2,35 +2,52 @@
 import pandas as pd
 import time
 
-# --- 1. THE SOVEREIGN HOOK LOGIC ---
-def generate_roi_hook(name, role, niche):
-    """Architects a high-conversion pitch using Sovereign Psychology"""
-    hooks = [
-        f"Subject: Solving the {niche} Efficiency Gap for {name}\n\nHi {name}, I noticed your work as a {role}. Most in {niche} are losing 20% ROI to manual processes. Our AI Swarm can recover that. Ready to talk?",
-        f"Hi {name}, quick question: Is your {niche} firm ready for the 2026 AI shift? As a {role}, you know speed is the only moat. I have a blueprint for you.",
-        f"Greetings {name}. Your role as {role} puts you in a unique position to dominate the {niche} market in Nigeria. I've mapped a 10x growth path for you."
-    ]
-    return hooks[0] # Defaulting to the most industrial hook
+# --- 1. THE BULK HOOK ENGINE ---
+def generate_bulk_hooks(df):
+    """Architects a campaign manifesto for every lead in the dataframe"""
+    manifesto = "OWO-NEXUS SOVEREIGN OUTREACH MANIFESTO\n"
+    manifesto += f"Generated on: {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
+    manifesto += "="*40 + "\n\n"
+    
+    for _, row in df.iterrows():
+        hook = f"TARGET: {row['Name']} ({row['Role']})\n"
+        hook += f"NICHE: {row['Niche']} | {row['Location']}\n"
+        hook += f"PITCH: Hi {row['Name']}, I noticed your work as a {row['Role']} in {row['Location']}. "
+        hook += f"Most in {row['Niche']} are losing ROI to manual processes. Ready to scale?\n"
+        hook += "-"*20 + "\n"
+        manifesto += hook
+        
+    return manifesto
 
-# --- 2. INTEGRATING INTO THE UI ---
+# --- 2. UPDATING THE UI IN TAB 1 ---
 def main():
     # ... (Previous code remains) ...
 
-    # --- INSIDE TAB 1 (The Swarm) after displaying the dataframe ---
     if st.session_state.get('last_results') is not None:
-        st.subheader("🎯 Generate ROI Hooks")
-        
-        # Create a dropdown to select a specific lead to "Hook"
         df = st.session_state['last_results']
-        selected_lead = st.selectbox("Select a Lead to Hook:", df['Name'])
+        status = "Marksman" if st.session_state.get('verified_user') else "Grassroots"
         
-        if st.button("GENERATE SOVEREIGN HOOK"):
-            lead_data = df[df['Name'] == selected_lead].iloc[0]
-            
-            with st.spinner(f"Architecting hook for {selected_lead}..."):
-                time.sleep(1)
-                hook_text = generate_roi_hook(lead_data['Name'], lead_data['Role'], lead_data['Niche'])
-                
-                st.code(hook_text, language="text")
-                st.success("ROI Hook Generated. Copy and Send.")
-                st.info("💡 Pro-Tip: Send this via LinkedIn for a 40% higher response rate.")
+        st.divider()
+        st.subheader("🎯 Sovereign Hook Center")
+        
+        # --- THE BULK OPTION (MARKSMAN ONLY) ---
+        if status in ["Marksman", "Overlord"]:
+            st.info("💎 MARKS-LEVEL ACCESS: Bulk Generation Enabled.")
+            if st.button("🚀 GENERATE BULK MANIFESTO"):
+                with st.spinner("Architecting Campaign..."):
+                    time.sleep(2)
+                    manifesto_text = generate_bulk_hooks(df)
+                    
+                    st.download_button(
+                        label="📥 Download Outreach Manifesto",
+                        data=manifesto_text,
+                        file_name=f"Sovereign_Manifesto_{int(time.time())}.txt",
+                        mime="text/plain"
+                    )
+                    st.success("Manifesto Ready. Your swarm is prepared for deployment.")
+        else:
+            # Individual Hook (The "Tease" for lower tiers)
+            selected_lead = st.selectbox("Select a Lead to Hook:", df['Name'])
+            if st.button("Generate Single Hook"):
+                # (Previous single hook logic)
+                st.warning("Bulk generation is reserved for **MARKSMAN** tier.")
